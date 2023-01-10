@@ -5,19 +5,35 @@ import { useState } from 'react';
 function App(){
   const [input, setInput] = useState('');
   const [tasks, setTasks] = useState([])
+  const [hidden, setHidden] = useState("")
 
-  const [doneTotal, setDoneTotal] = useState(0)
+  const [doneTotal, setDoneTotal] = useState(0);
 
   const AddList = () => {
-    const NewObj = {
-      id: tasks.length ,
-      title: input,
-      isDone : false
+    if(hidden.length === 0 ){
+      console.log(hidden);
+      const NewObj = {
+        id: tasks.length ,
+        title: input,
+        isDone : false
+      }
+      const NewArr = [...tasks]
+      NewArr.push(NewObj)
+      setTasks(NewArr)
+      setInput('')
+    }else{
+      console.log(hidden);
+      tasks.map((a)=>{
+        if(hidden === a.id){
+          a.title = input
+          setInput("")
+        }
+        return(
+          setHidden("")
+          
+        )
+      })
     }
-    const NewArr = [...tasks]
-    NewArr.push(NewObj)
-    setTasks(NewArr)
-    setInput('')
   }
   const finished = (id) =>{
     const objList = tasks.map((val) => {
@@ -33,6 +49,35 @@ function App(){
     })
     setTasks(objList)
   }
+
+  const remove = (id) =>{
+    let survive = tasks.filter(tasks => tasks.id !== id);
+    let too = 0
+    setDoneTotal(0)
+    console.log(doneTotal);
+    setTasks(survive)
+    tasks.map((a)=>{
+      if(a.isDone === true){
+        too++
+      }
+      return(
+        setDoneTotal(too)
+      )
+    })
+  }
+
+  const edit = (id)=>{
+    tasks.map((e) =>{
+      if (e.id === id ){
+        setInput(e.title)
+        setHidden(id)
+        console.log(hidden);
+      } 
+      return (
+        tasks
+      )
+    })
+  }
   return (
     <div className='container'>
       <div className='row'>
@@ -42,6 +87,7 @@ function App(){
           <p>Done {doneTotal}</p>
           <div className='d-flex gap-2'>
             <input type="text" placeholder='Add to do list' value={input} onChange={(e)=>{setInput(e.target.value)}}  className="form-control"/>
+            <input type="hidden" value={hidden}/>
             <button className='btn btn-primary' onClick={AddList}>Add</button>
           </div>
         </div>
@@ -52,14 +98,15 @@ function App(){
             <div className='row d-flex gap-2 border rounded align-items-center p-2 m-1'> 
               <input type="checkbox" checked={a.isDone} className="col-1" onChange={() => finished(a.id)}/>
               <p className='col-8 m-0'>{a.title}</p>
-              <button className='btn col-1  btn-danger'>Delete</button>
-              <button className='btn col-1  btn-warning'>Edit</button>
+              <button className='btn col-1  btn-danger' onClick={()=>remove(a.id)}>Delete</button>
+              <button className='btn col-1  btn-warning' onClick={()=>edit(a.id)}>Edit</button>
             </div>
           )
         })}
       </div>
     </div>
   )
+  
 }
 export default App
 // import './App.css';
