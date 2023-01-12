@@ -1,11 +1,13 @@
 import './App.css';
 import { useState } from 'react';
+import Modal from './modal';
 
 // {id , title, checked }
 function App(){
   const [input, setInput] = useState('');
   const [tasks, setTasks] = useState([])
   const [hidden, setHidden] = useState("")
+  const [modal, setModal] = useState(false)
 
   const [doneTotal, setDoneTotal] = useState(0);
 
@@ -78,6 +80,9 @@ function App(){
       )
     })
   }
+  const modalChange=()=>{
+    setModal(!modal)
+  }
   return (
     <div className='container'>
       <div className='row'>
@@ -89,6 +94,7 @@ function App(){
             <input type="text" placeholder='Add to do list' value={input} onChange={(e)=>{setInput(e.target.value)}}  className="form-control"/>
             <input type="hidden" value={hidden}/>
             <button className='btn btn-primary' onClick={AddList}>Add</button>
+            <button className='btn btn-primary' onClick={modalChange}>Modal</button>
           </div>
         </div>
       </div>
@@ -103,6 +109,9 @@ function App(){
             </div>
           )
         })}
+      </div>
+      <div>
+        {modal && ( <Modal modal ={modal} setModal = {modalChange} input={input} setInput={setInput}  addList={AddList} />)}
       </div>
     </div>
   )
