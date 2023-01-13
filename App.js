@@ -1,24 +1,27 @@
 import './App.css';
 import { useState } from 'react';
-import Modal from './modal';
-
-// {id , title, checked }
+import Modal from './component/modal';
+import Todolist from './component/Todolist';
 function App(){
   const init = {
     id:"",
     input:"",
-    type:"",
+    type:0,
+    isCore : false,
     isDone: false,
-    doneTotal: 0,
   }
-  const [tasks, setTasks] = useState([init])
-  const [hidden, setHidden] = useState("")
+  const [tasks, setTasks] = useState([])
   const [modal, setModal] = useState(false)
+  const [doneTotal, setDoneTotal] = useState(0)
+  const [Obj, setObj] = useState(init)
+  const [editStatus, setEditStatus]= useState(false)
 
   const AddList = () => {
-    setTasks({...tasks, id: createID, })
+    setTasks([...tasks, {...Obj, id: createID()}])
+    setEditStatus(false)
+    setObj(init)
+    setModal(!modal)
   }
-
   const createID = ()=>{
     let abc = "ABCDEFGHIJKLMNOPQR"
     let num = "1234567890"
@@ -26,44 +29,36 @@ function App(){
     let newNum = num.split("")[Math.floor(Math.random()* 10)]+""+num.split("")[Math.floor(Math.random()* 10)]+""+num.split("")[Math.floor(Math.random()* 10)]
     return newStr +  newNum
   }
-
-
-  const finished = (id) =>{
-    const aa = tasks.map((val) => {
-      if (val.id === id ){
-        // val.isDone = !val.isDone;
-        if(val.isDone){
-         return  {...val, doneTotal: tasks.doneTotal + 1}
-        } else {
-          return {...val, doneTotal: tasks.doneTotal + 1}
-        }
-      }
-      return val 
-    })
-    setTasks(aa)
-
-  }
-
-  const remove = (id) =>{
-    let survive = tasks.filter(tasks => tasks.id !== id);
-    let too = 0
-    setTasks({...tasks, doneTotal: 0})
-
-    setTasks(survive)
-    setTasks(tasks.map((a)=>{
-      if(a.isDone === true){
-        too++
-      }
-      return({...a, doneTotal: too}
-      )
-    }))
-  }
-
-  const edit = (id)=>{
-   
-  }
   const modalChange=()=>{
     setModal(!modal)
+  }
+  // const done=(id)=>{
+  //   tasks.map((a)=>{
+  //     if(id === a.id){
+  //       console.log(a);
+  //       // let cop = {...tasks}
+  //       // setTasks([...tasks, ...a, isDone : !a.isDone])
+  //       if(a.id){
+  //         setDoneTotal(doneTotal + 1)
+  //       }else {
+  //         setDoneTotal(doneTotal - 1)
+  //       }
+  //     }
+  //   })
+  // }
+  const deleteList =(id)=>{
+    return(
+    setTasks(tasks.filter((obj)=> id !== obj.id))
+    )
+  }
+  const edit=(id)=>{
+    tasks.map((a)=>{
+      if(id===a.id){
+        setObj({...Obj, id: a.id,  input: a.input,  type: a.type,  isCore :a.isCore, isDone: a.isDone})
+      }
+    })
+    setEditStatus(true)
+    modalChange()
   }
   return (
     <div className='container'>
@@ -71,32 +66,17 @@ function App(){
         <div className=' col-6'>
           <h1>To Do list</h1>
           Total {tasks.length}
-          <p>Done {tasks.doneTotal}</p>
+          <p>Done {doneTotal}</p>
           <div className='d-flex gap-2'>
-            <input type="text" placeholder='Add to do list' value={tasks.input} onChange={(e)=>{setTasks({...tasks , input : e.target})}}  className="form-control"/>
-            <input type="hidden" value={hidden}/>
-            <button className='btn btn-primary' onClick={AddList}>Add</button>
-            <button className='btn btn-primary' onClick={modalChange}>Modal</button>
+            <button className='btn btn-primary' onClick={modalChange}>Add List</button>
           </div>
         </div>
       </div>
-      <div className='mt-3 pt-3 border-top '>
-        {tasks.map((a) => {
-          return(
-            <div className='row d-flex gap-2 border rounded align-items-center p-2 m-1'> 
-              <input type="checkbox" checked={a.isDone} className="col-1" onChange={() => finished(a.id)}/>
-              <p className='col-8 m-0'>{a.input}</p>
-              <button className='btn col-1  btn-danger' onClick={()=>remove(a.id)}>Delete</button>
-              <button className='btn col-1  btn-warning' onClick={()=>edit(a.id)}>Edit</button>
-            </div>
-          )
-        })}
-      </div>
+      <Todolist tasks={tasks} setTasks={setTasks}  deleteList={deleteList} edit={edit} />
       <div>
-        {modal && ( <Modal modal ={modal} setModal = {modalChange} setTasks={setTasks} tasks={tasks} addList={AddList} />)}
+        {modal && ( <Modal modal ={modal} setModal = {modalChange}  setTasks={setTasks} tasks={tasks} addList={AddList} Obj={Obj} setObj={setObj} editStatus={editStatus} init={init}/>)}
       </div>
     </div>
   )
-  
 }
 export default App
